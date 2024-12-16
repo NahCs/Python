@@ -19,7 +19,25 @@ def registrar_producto():
     print(f" '{nombre}' con cantidad {cantidad} fue agregado al inventario con el numero de id: {id}\n")
 
 def actualizar_producto():
-    print("aca se podra actualizar los productos")
+       #solicito el ID del producto para luego guardarlo en la variable
+    id_producto = int(input("Ingrese el ID del producto a actualizar: "))
+    producto_encontrado = None
+
+    for producto in inventario:
+        #Aca comparo el numero guardado en variable con los ya ingresados en la tabla
+        if producto["id"] == id_producto:
+            producto_encontrado = producto
+            break
+
+    if producto_encontrado:
+        print(f"Producto encontrado: ID: {producto['id']} | Nombre: {producto['nombre']} | Cantidad: {producto['cantidad']} | Precio: {producto['precio']} | Categoria: {producto['categoria']} \n")
+        nueva_cantidad = int(input("Ingrese la nueva cantidad: "))
+        nuevo_precio = float(input("Ingrese el nuevo precio: "))
+        producto_encontrado["cantidad"] = nueva_cantidad
+        producto_encontrado["precio"] = nuevo_precio
+        print(f"Producto actualizado!")
+    else:
+        print(f"No se encontró un producto con el ID {id_producto}")
 
 
 def eliminar_producto():
