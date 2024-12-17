@@ -1,3 +1,6 @@
+import sqlite3
+con = sqlite3.connect('inventario.db')
+
 inventario = []
 
 def mostrar_productos():
