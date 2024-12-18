@@ -1,46 +1,72 @@
 import sqlite3
-con = sqlite3.connect('inventario.db')
+conexion = sqlite3.connect('inventario.db')
+cur = conexion.cursor()
+cur.execute(''' CREATE TABLE IF NOT EXISTS productos (
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre   TEXT    NOT NULL,
+    cantidad INTEGER NOT NULL,
+    precio   REAL    NOT NULL,
+    categoria TEXT    NOT NULL
+) ''')
+conexion.commit()
+
 
 inventario = []
 
-def mostrar_productos():
-    if inventario:
-        print("Productos del inventario:")
-        for producto in inventario:
-            print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Cantidad: {producto['cantidad']} | Precio: {producto['precio']} \n")
-    else:
-        print("<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        print("No hay prductos que mostar")
-        print("<<<<<<<<<<<<<<<<<<<<<<<<<< \n")
+
 
 def registrar_producto():
-    id = int(input("ingrese el id del producto: "))
     nombre = input("Ingrese el nombre del producto: ")
     cantidad = int(input("Ingrese la cantidad: "))
     precio = float(input("Ingrese el precio del producto: "))
-    inventario.append({"id": id, "nombre": nombre, "cantidad": cantidad, "precio": precio})
-    print(f" '{nombre}' con cantidad {cantidad} fue agregado al inventario con el numero de id: {id}\n")
+    categoria = input("Ingrese la categoria del producto: ")
+    consulta = "INSERT INTO productos (nombre, cantidad, precio, categoria) VALUES (?, ?, ?, ?)"
+    cur.execute(consulta, (nombre, cantidad, precio, categoria))
+    conexion.commit()
+    print(f" '{nombre}' con cantidad {cantidad} fue agregado con exito al inventario!\n")
+
+
+
+def mostrar_productos():
+    cur.execute("SELECT * FROM productos")
+    productos = cur.fetchall()
+    if productos:
+        print("\nListado de Productos\n")
+        for producto in productos:
+            print(f"Id: {producto[0]} | Nombre: {producto[1]} | Cantidad: {producto[2]} | Precio: {producto[3]} | Categoría: {producto[4]}")
+    else:
+        print("No hay productos en el inventario\n")
+
+
+
 
 def actualizar_producto():
-       #solicito el ID del producto para luego guardarlo en la variable
-    id_producto = int(input("Ingrese el ID del producto a actualizar: "))
-    producto_encontrado = None
+    cur.execute("SELECT * FROM productos")
+    productos = cur.fetchall()
 
-    for producto in inventario:
-        #Aca comparo el numero guardado en variable con los ya ingresados en la tabla
-        if producto["id"] == id_producto:
-            producto_encontrado = producto
-            break
+    if productos:
+        print("\nListado de Productos\n")
+        for producto in productos:
+            print(f"ID: {producto[0]} | Nombre: {producto[1]} | Cantidad: {producto[2]} | Precio: {producto[3]} | Categoría: {producto[4]}")
+        print("")
 
-    if producto_encontrado:
-        print(f"Producto encontrado: ID: {producto['id']} | Nombre: {producto['nombre']} | Cantidad: {producto['cantidad']} | Precio: {producto['precio']} | Categoria: {producto['categoria']} \n")
-        nueva_cantidad = int(input("Ingrese la nueva cantidad: "))
-        nuevo_precio = float(input("Ingrese el nuevo precio: "))
-        producto_encontrado["cantidad"] = nueva_cantidad
-        producto_encontrado["precio"] = nuevo_precio
-        print(f"Producto actualizado!")
+        # A partir de aca, solicito al usuario que ingrese el ID del producto a modificar
+        id_producto = int(input("Ingrese el ID del producto a actualizar: "))
+        cur.execute("SELECT * FROM productos WHERE id = ?", (id_producto,))
+        producto = cur.fetchone()
+        #Aca realizo el cambio para luego guardalo en la base de datos
+        if producto:
+            print(f"Producto encontrado: Nombre: {producto[1]} | Cantidad: {producto[2]} | Precio: {producto[3]}")
+            nueva_cantidad = int(input("Ingrese la nueva cantidad: "))
+            nuevo_precio = float(input("Ingrese el nuevo precio: "))
+            cur.execute("UPDATE productos SET cantidad = ?, precio = ? WHERE id = ?", (nueva_cantidad, nuevo_precio, id_producto))
+            conexion.commit()
+            print("Producto actualizado con éxito!\n")
+        else:
+            print(f"No se encontró un producto con el ID {id_producto}.\n")
     else:
-        print(f"No se encontró un producto con el ID {id_producto}")
+        print("No hay productos disponibles para actualizar\n")
+
 
 
 def eliminar_producto():
@@ -49,8 +75,19 @@ def eliminar_producto():
 def buscar_producto():
     print("Aca vas a poder buscar productos")
 
+
 def reporte_bajo_stock():
-    print("aca vas a poder quejarte de lo que hay")
+    limite = int(input("Ingrese la cantidad a buscar: "))
+
+    cur.execute("SELECT * FROM productos WHERE cantidad < ?", (limite,))
+    productos = cur.fetchall()
+
+    if productos:
+        print("Estos son los productos que deberia reponer lo antes posible")
+        for producto in productos:
+            print(f"ID: {producto[0]} | Nombre: {producto[1]} | Cantidad: {producto[2]} | Precio: {producto[3]} | Categoría: {producto[4]}")
+    else:
+        print("Genial! No hay productos con bajo stock\n")
 
 
 while True:
@@ -82,3 +119,4 @@ while True:
         reporte_bajo_stock()
     elif opcion == "7":
         break
+
