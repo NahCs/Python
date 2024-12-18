@@ -1,6 +1,10 @@
-El programa realizado en el lenguaje de python crea un menu interactivo en el cual le permite al usuario seleccionar diferentes opciones relazionadas con la gestion de productos
-En un principio las opciones agregar y consultar productos ya estan creadas, pero las de actualizar, elimincar, buscar y stock solo estan planteadas
-En la actualizacion lo que se busca es que mediante el Id podamos modificar la cantidad disponible
-Con la opcion Eliminar, el programa debe permitir la eliminacion de un producto del inventario a partir del ID
-Con la Busqueda, se desea que solamente con el ID te ofrezca todos los datos al respecto
-Y con el stock, el programa debe traer un reporte de los productos que tengan igual o menor cantidad que el limite especificado por el usuario
+El programa realizado en el lenguaje de python, crea una aplicacion de gestion de inventario, la cual utiliza una base de datos QSLite para almacenar la informacion de los productos
+Es un menú simple e intuitivo que permite al usuario realizar las siguientes acciones: Agregar,actualizar, eliminar como asi tambien ver la totalidad de los productos agregados y ver cuales poseen bajo stock
+
+
+Agregar productos: permite al usuario ingresar el nombre, la cantidad, el precio y la categoria del producto a almacenar
+Actualizar: permite al usuario modificar tanto el precio como la cantidad mediante el ID generado por la base de datos
+Inventario: Trae todos los productos almacenados en la base de datos
+Buscar: Permite buscar un producto en concreto mediante el ID
+Stock: Filtra todo producto que posea menos de la cantidad ingresada por el usuario
+Eliminar:Permite al usuario eliminar un producto especifico del inventario
