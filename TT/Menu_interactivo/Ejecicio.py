@@ -14,7 +14,6 @@ conexion.commit()
 inventario = []
 
 
-
 def registrar_producto():
     nombre = input("Ingrese el nombre del producto: ")
     cantidad = int(input("Ingrese la cantidad: "))
@@ -26,7 +25,7 @@ def registrar_producto():
     print(f" '{nombre}' con cantidad {cantidad} fue agregado con exito al inventario!\n")
 
 
-
+#Trae la totalidad de los productos ingresados en la base de datos
 def mostrar_productos():
     cur.execute("SELECT * FROM productos")
     productos = cur.fetchall()
@@ -35,7 +34,7 @@ def mostrar_productos():
         for producto in productos:
             print(f"Id: {producto[0]} | Nombre: {producto[1]} | Cantidad: {producto[2]} | Precio: {producto[3]} | Categoría: {producto[4]}")
     else:
-        print("No hay productos en el inventario\n")
+        print("No hay productos en el inventario :( \n")
 
 
 
@@ -43,7 +42,7 @@ def mostrar_productos():
 def actualizar_producto():
     cur.execute("SELECT * FROM productos")
     productos = cur.fetchall()
-
+    #Trae todos los productos agregados hasta el momento
     if productos:
         print("\nListado de Productos\n")
         for producto in productos:
@@ -63,25 +62,44 @@ def actualizar_producto():
             conexion.commit()
             print("Producto actualizado con éxito!\n")
         else:
-            print(f"No se encontró un producto con el ID {id_producto}.\n")
+            print(f"No se encontro ningun producto con el ID {id_producto}\n")
     else:
         print("No hay productos disponibles para actualizar\n")
 
 
-
 def eliminar_producto():
-    print("aca se podran eleminar los productos")
+    id_producto = int(input("Que producto desea eliminar? Ingrese el ID: "))
+    # Le pido al usuario un ID y verifico si el producto existe
+    cur.execute("SELECT * FROM productos WHERE id = ?", (id_producto,))
+    producto = cur.fetchone()
+    #Aca o elimino el producto sino, le aviso al usuario que no existe un producto con ese ID
+    if producto:
+        cur.execute("DELETE FROM productos WHERE id = ?", (id_producto,))
+        conexion.commit()
+        print(f"Producto con ID {id_producto} acaba de ser eliminado\n")
+    else:
+        print(f"No se encontro ningun producto con el ID {id_producto}\n")
 
+
+#En caso de querer buscar un producto en concreto
 def buscar_producto():
-    print("Aca vas a poder buscar productos")
+    id_producto = int(input("Ingrese el ID del producto que desea buscar: "))
+
+    cur.execute("SELECT * FROM productos WHERE id = ?", (id_producto,))
+    producto = cur.fetchone()
+
+    if producto:
+        print(f"Producto encontrado! ID: {producto[0]} | Nombre: {producto[1]} | Cantidad: {producto[2]} | Precio: {producto[3]} | Categoría: {producto[4]}")
+    else:
+        print(f"No se encontro ningun producto con el ID {id_producto} verifique nuevamente\n") #Se que revea el listado antes de hacer una consulta nuevamente
 
 
 def reporte_bajo_stock():
     limite = int(input("Ingrese la cantidad a buscar: "))
-
+    #Hace la busqueda, verificar si es menor o menor igual
     cur.execute("SELECT * FROM productos WHERE cantidad < ?", (limite,))
     productos = cur.fetchall()
-
+    #Trae todo producto solicitado por el usuario
     if productos:
         print("Estos son los productos que deberia reponer lo antes posible")
         for producto in productos:
@@ -118,5 +136,7 @@ while True:
     elif opcion == "6":
         reporte_bajo_stock()
     elif opcion == "7":
+        print("Nos vemos!")
+        conexion.close()
         break
 
